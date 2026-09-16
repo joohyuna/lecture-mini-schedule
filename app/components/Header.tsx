@@ -13,7 +13,6 @@ interface Props {
   onPrevDay: () => void;
   onNextDay: () => void;
   onOpenDatePopup: () => void;
-  onOpenAdd: () => void;
   onCycleTheme: () => void;
   onExport: () => string;
   onImport: (text: string) => void;
@@ -30,7 +29,6 @@ export default function Header({
   onPrevDay,
   onNextDay,
   onOpenDatePopup,
-  onOpenAdd,
   onCycleTheme,
   onExport,
   onImport,
@@ -38,15 +36,32 @@ export default function Header({
   const today = !readOnly;
 
   return (
-    <header className="mb-5 flex flex-wrap items-center justify-between gap-3">
-      <div className="flex items-center gap-1.5">
+    <header className="mb-5 space-y-3">
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="whitespace-nowrap text-lg font-bold tracking-tight sm:text-xl">
+          미니다이어리
+        </h1>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onOpenDatePopup}
+            aria-label="다이어리 날짜 선택"
+            className={navBtn}
+          >
+            📅
+          </button>
+          <ThemeToggle mode={themeMode} onCycle={onCycleTheme} />
+          <SettingsMenu onExport={onExport} onImport={onImport} />
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-center gap-1.5">
         <button type="button" onClick={onPrevDay} aria-label="이전 날" className={navBtn}>
           ‹
         </button>
-        <h1 className="whitespace-nowrap text-lg font-bold tracking-tight sm:text-xl">
-          <span className="mr-1.5">📔</span>
+        <h2 className="whitespace-nowrap text-base font-semibold tracking-tight sm:text-lg">
           {formatKoreanDate(selectedDate)}
-        </h1>
+        </h2>
         <button
           type="button"
           onClick={onNextDay}
@@ -61,26 +76,6 @@ export default function Header({
             지난 기록 · 읽기 전용
           </span>
         )}
-        <button
-          type="button"
-          onClick={onOpenDatePopup}
-          className="rounded-lg border border-neutral-200 px-2.5 py-1 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-        >
-          📖 다이어리
-        </button>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={onOpenAdd}
-          disabled={!today}
-          className="rounded-lg bg-neutral-900 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-neutral-700 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-white"
-        >
-          + 입력
-        </button>
-        <ThemeToggle mode={themeMode} onCycle={onCycleTheme} />
-        <SettingsMenu onExport={onExport} onImport={onImport} />
       </div>
     </header>
   );

@@ -115,7 +115,6 @@ export default function HomePage() {
         onPrevDay={() => goRelative(-1)}
         onNextDay={() => goRelative(1)}
         onOpenDatePopup={() => setDateOpen(true)}
-        onOpenAdd={() => openAdd("donow")}
         onCycleTheme={theme.cycle}
         onExport={diary.exportJSON}
         onImport={diary.importJSON}
