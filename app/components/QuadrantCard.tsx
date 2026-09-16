@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { cn } from "../lib/cn";
 import {
+  CARD_VISIBLE_LIMIT,
   CARRYABLE,
   CATEGORY_META,
   MAX_ITEMS_PER_CARD,
@@ -10,6 +12,7 @@ import {
 } from "../lib/types";
 import { formatShortDate } from "../lib/date";
 import ItemRow from "./ItemRow";
+import CardDetailModal from "./CardDetailModal";
 
 interface Props {
   category: Category;
@@ -34,6 +37,8 @@ export default function QuadrantCard({
   onDelete,
   onCarry,
 }: Props) {
+  const [detailOpen, setDetailOpen] = useState(false);
+
   const meta = CATEGORY_META[category];
   const full = items.length >= MAX_ITEMS_PER_CARD;
   const canCarry =
@@ -41,6 +46,13 @@ export default function QuadrantCard({
 
   const kept = items.filter((it) => it.status !== "broken").length;
   const brokenCount = items.filter((it) => it.status === "broken").length;
+
+  // 카드에는 최신(최근 생성) 순으로 최대 CARD_VISIBLE_LIMIT개만 보여주고,
+  // 나머지는 "더보기" 팝업(CardDetailModal)에서 전체 목록으로 확인한다.
+  const visibleItems = [...items]
+    .sort((a, b) => b.createdAt - a.createdAt)
+    .slice(0, CARD_VISIBLE_LIMIT);
+  const hiddenCount = items.length - visibleItems.length;
 
   return (
     <section className="flex flex-col rounded-xl border border-neutral-200 bg-white p-4 md:w-[calc(50%-0.5rem)] dark:border-neutral-800 dark:bg-neutral-900">
@@ -57,8 +69,8 @@ export default function QuadrantCard({
         </span>
       </header>
 
-      <ul className="max-h-72 flex-1 space-y-0.5 overflow-y-auto">
-        {items.map((item) => (
+      <ul className="flex-1 space-y-0.5">
+        {visibleItems.map((item) => (
           <ItemRow
             key={item.id}
             item={item}
@@ -107,6 +119,16 @@ export default function QuadrantCard({
         )}
       </ul>
 
+      {hiddenCount > 0 && (
+        <button
+          type="button"
+          onClick={() => setDetailOpen(true)}
+          className="mt-1 text-xs font-medium text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300"
+        >
+          더보기 +{hiddenCount}
+        </button>
+      )}
+
       {!readOnly && items.length > 0 && (
         <button
           type="button"
@@ -122,6 +144,18 @@ export default function QuadrantCard({
           {full ? "카드당 최대 10개" : "+ 항목 추가"}
         </button>
       )}
+
+      <CardDetailModal
+        open={detailOpen}
+        category={category}
+        items={items}
+        readOnly={readOnly}
+        onClose={() => setDetailOpen(false)}
+        onAdd={onAdd}
+        onToggle={onToggle}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
     </section>
   );
 }
