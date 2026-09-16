@@ -45,12 +45,14 @@ export default function ItemRow({
   return (
     <li
       className={cn(
-        "group flex items-center gap-2 rounded-md px-2 py-1.5 text-sm",
-        "hover:bg-neutral-100 dark:hover:bg-neutral-800/60"
+        "group flex flex-col gap-1 rounded-md px-2 py-1.5 text-sm",
+        "hover:bg-neutral-100 dark:hover:bg-neutral-800/60",
+        "md:flex-row md:items-center md:gap-2"
       )}
     >
-      {/* 상태 토글 */}
-      {isDont ? (
+      <div className="flex items-center gap-2 md:min-w-0 md:flex-1">
+        {/* 상태 토글 */}
+        {isDont ? (
         <button
           type="button"
           disabled={readOnly}
@@ -129,10 +131,11 @@ export default function ItemRow({
           {item.text}
         </span>
       )}
+      </div>
 
       {/* 액션 */}
       {!readOnly && !editing && (
-        <span className="flex shrink-0 items-center gap-1 opacity-0 transition group-hover:opacity-100 focus-within:opacity-100">
+        <span className="flex shrink-0 items-center justify-end gap-1 opacity-100 transition md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100">
           <button
             type="button"
             onClick={() => setEditing(true)}
@@ -157,10 +160,18 @@ export default function ItemRow({
           >
             <svg viewBox="0 0 16 16" className="size-3.5" aria-hidden="true">
               <path
-                d="M4 4l8 8M12 4l-8 8"
+                d="M3 4.5h10M6.3 4.5V3.3a1 1 0 0 1 1-1h1.4a1 1 0 0 1 1 1v1.2M4.5 4.5l.6 8.2a1 1 0 0 0 1 .9h3.8a1 1 0 0 0 1-.9l.6-8.2"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="1.6"
+                strokeWidth="1.3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M6.7 7v4M9.3 7v4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.3"
                 strokeLinecap="round"
               />
             </svg>

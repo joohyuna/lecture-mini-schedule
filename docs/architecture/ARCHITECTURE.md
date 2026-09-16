@@ -79,16 +79,17 @@ type DayMeta = Record<string, { total: number; open: number; broken: number; fee
 
 - `app/page.tsx` — 페이지 조립, 자정 롤오버 처리
   - `Header` — 날짜, 이전/다음 이동, `DiaryDatePopupTrigger`, `AddButton`, `ThemeToggle`
-  - `AddItemModal` — 내용 입력 + 카테고리 세그먼트
-  - `DiaryDatePopup` — 월 달력 기반 날짜 선택
+  - `AddItemModal` — 내용 입력 + 카테고리 세그먼트 (`Sheet` 기반)
+  - `DiaryDatePopup` — 월 달력 기반 날짜 선택 (`Sheet` 기반, `align="start"`)
     - `MonthCalendar` — 6주×7일 격자, 기록/어김/피드백 점 표시
   - `Board`
     - `QuadrantCard` ×4 — props: `title`, `category`, `items`, `readOnly`, 요약
       - `ItemRow` — 상태 토글, 텍스트(인라인 편집), 수정/삭제
       - `CarryForwardPrompt` — 비어 있을 때 [지난 항목 불러오기] / [직접 적기]
-      - `CardDetailModal` — "더보기" 팝업, 카드의 전체 항목(체크/수정/삭제 포함)
+      - `CardDetailModal` — "더보기" 팝업, 카드의 전체 항목(체크/수정/삭제 포함) (`Sheet` 기반)
   - `DailyFeedback` — textarea + 메모 저장 버튼(읽기 전용 지원)
   - `SettingsMenu` — JSON 내보내기 / 가져오기
+- `Sheet` — 세 팝업(`AddItemModal`/`DiaryDatePopup`/`CardDetailModal`)이 공유하는 래퍼. 모바일은 하단 바텀시트, `md:`부터는 중앙(또는 상단) 모달. 배경 클릭·Esc 닫기, `document.body`로의 포털 렌더링을 여기서 전담.
 
 | 역할 | 파일 |
 |---|---|
@@ -111,6 +112,7 @@ type DayMeta = Record<string, { total: number; open: number; broken: number; fee
 | 날짜 선택 팝업(월 달력) | `app/components/DiaryDatePopup.tsx` |
 | 월 달력 격자 | `app/components/MonthCalendar.tsx` |
 | 하루의 피드백 메모 | `app/components/DailyFeedback.tsx` |
+| 팝업 공통 래퍼(바텀시트/모달, 배경·Esc 닫기, 포털) | `app/components/Sheet.tsx` |
 
 ## 4. 구현상 확정된 세부 규칙
 
@@ -122,7 +124,9 @@ type DayMeta = Record<string, { total: number; open: number; broken: number; fee
 - 날짜 이동: 스와이프는 세로 스크롤보다 가로 이동이 클 때만 인식, 방향키는 입력 중/팝업 열림 시 비활성, 미래 날짜 이동 차단.
 - 날짜 전환 시 `day-enter` 페이드, `prefers-reduced-motion` 존중.
 - 카드 표시: `CARD_VISIBLE_LIMIT`(5)개까지만 카드에 인라인 표시(최신순, `createdAt` 내림차순). 항목이 1개 이상이면 항상 "더보기" 버튼을 두고 `CardDetailModal`로 전체 목록을 보여준다(팝업 안에서도 체크/수정/삭제 가능). `Board`는 데스크탑·모바일 구분 없이 항상 2열 그리드(`flex-row flex-wrap`), 좁은 화면에서 한글이 음절 단위로 끊기지 않도록 카드 제목/항목 텍스트에 `break-keep` 적용.
+- 모바일 `ItemRow`: 1줄(체크박스+텍스트) / 2줄(수정·삭제, 오른쪽 정렬)로 세로 스택, `md:`부터는 기존처럼 한 줄. 수정/삭제 아이콘은 모바일에서 항상 노출(호버가 없어서), 데스크탑은 그대로 호버 시에만 노출. 삭제 아이콘은 팝업 닫기(✕)와 헷갈리지 않도록 쓰레기통 모양. "더보기"와 "+ 항목 추가"는 한 줄에 나란한 버튼 쌍으로 표시(모바일·데스크탑 공통). `CardDetailModal` 헤더에는 카드에서 숨긴 부제(예: "장기 목표")를 항상 표시.
 - `AGENTS.md`는 `next dev`가 자동 생성/재생성하는 보일러플레이트라 `.gitignore` 처리, 커밋하지 않는다. `CLAUDE.md`는 프로젝트 문서 규칙을 직접 작성해 넣은 파일이라 추적·커밋 대상이다.
+- 팝업(`Sheet`): 모바일은 하단 바텀시트(슬라이드업, 위쪽 모서리만 둥글게, 화면 가장자리까지 붙음), `md:`부터는 기존처럼 중앙(`DiaryDatePopup`만 상단) 모달. 드래그로 끌어내려 닫는 제스처는 넣지 않음(가벼운 버전). `document.body`에 React Portal로 렌더링한다 — `day-enter`처럼 `transform`이 걸린 조상 안에서 `position: fixed`를 쓰면 그 조상이 컨테이닝 블록이 되어버려 뷰포트 기준으로 고정되지 않는 CSS 문제가 있었음(배경 클릭으로 안 닫히는 버그로 발견). 세 팝업 모두 이 컴포넌트를 통해서만 열고 닫는다.
 
 ## 5. 현재 미구현 / 다음 후보
 

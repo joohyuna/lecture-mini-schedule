@@ -60,7 +60,9 @@ export default function QuadrantCard({
         <div className="flex min-w-0 items-center gap-2">
           <span className={cn("size-2 shrink-0 rounded-full", meta.dot)} aria-hidden="true" />
           <h2 className="break-keep font-semibold">{meta.label}</h2>
-          <span className="break-keep text-xs text-neutral-400">{meta.sub}</span>
+          <span className="hidden break-keep text-xs text-neutral-400 md:inline">
+            {meta.sub}
+          </span>
         </div>
         <span className="shrink-0 break-keep text-xs text-neutral-400">
           {meta.isDont
@@ -120,29 +122,31 @@ export default function QuadrantCard({
       </ul>
 
       {items.length > 0 && (
-        <button
-          type="button"
-          onClick={() => setDetailOpen(true)}
-          className="mt-1 text-xs font-medium text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300"
-        >
-          {hiddenCount > 0 ? `더보기 +${hiddenCount}` : "더보기"}
-        </button>
-      )}
+        <div className="mt-2 flex gap-2">
+          <button
+            type="button"
+            onClick={() => setDetailOpen(true)}
+            className="flex-1 rounded-md border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-500 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800"
+          >
+            {hiddenCount > 0 ? `더보기 +${hiddenCount}` : "더보기"}
+          </button>
 
-      {!readOnly && items.length > 0 && (
-        <button
-          type="button"
-          onClick={() => onAdd(category)}
-          disabled={full}
-          className={cn(
-            "mt-2 rounded-md border border-dashed px-3 py-1.5 text-xs transition",
-            full
-              ? "cursor-not-allowed border-neutral-200 text-neutral-300 dark:border-neutral-800 dark:text-neutral-600"
-              : "border-neutral-300 text-neutral-500 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800"
+          {!readOnly && (
+            <button
+              type="button"
+              onClick={() => onAdd(category)}
+              disabled={full}
+              className={cn(
+                "flex-1 rounded-md border border-dashed px-3 py-1.5 text-xs transition",
+                full
+                  ? "cursor-not-allowed border-neutral-200 text-neutral-300 dark:border-neutral-800 dark:text-neutral-600"
+                  : "border-neutral-300 text-neutral-500 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800"
+              )}
+            >
+              {full ? "카드당 최대 10개" : "+ 항목 추가"}
+            </button>
           )}
-        >
-          {full ? "카드당 최대 10개" : "+ 항목 추가"}
-        </button>
+        </div>
       )}
 
       <CardDetailModal

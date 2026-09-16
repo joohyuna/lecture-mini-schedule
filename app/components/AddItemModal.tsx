@@ -8,6 +8,7 @@ import {
   MAX_TEXT_LENGTH,
   type Category,
 } from "../lib/types";
+import Sheet from "./Sheet";
 
 interface Props {
   open: boolean;
@@ -34,17 +35,6 @@ export default function AddItemModal({
     }
   }, [open, defaultCategory]);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
-
-  if (!open) return null;
-
   const disabled = disabledCategories.includes(category);
 
   const submit = (e: React.FormEvent) => {
@@ -55,39 +45,28 @@ export default function AddItemModal({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-      onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label="새 항목"
-        className="w-full max-w-sm rounded-2xl border border-neutral-200 bg-white p-5 shadow-xl dark:border-neutral-800 dark:bg-neutral-900"
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-bold">새 항목</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="닫기"
-            className="rounded p-1 text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-          >
-            <svg viewBox="0 0 16 16" className="size-4" aria-hidden="true">
-              <path
-                d="M4 4l8 8M12 4l-8 8"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
-        </div>
+    <Sheet open={open} onClose={onClose} ariaLabel="새 항목">
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-base font-bold">새 항목</h2>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="닫기"
+          className="rounded p-1 text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+        >
+          <svg viewBox="0 0 16 16" className="size-4" aria-hidden="true">
+            <path
+              d="M4 4l8 8M12 4l-8 8"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+      </div>
 
-        <form onSubmit={submit} className="space-y-4">
+      <form onSubmit={submit} className="space-y-4">
           <div>
             <span className="mb-1.5 block text-xs font-semibold text-neutral-500">
               카테고리
@@ -171,8 +150,7 @@ export default function AddItemModal({
               저장
             </button>
           </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </Sheet>
   );
 }
