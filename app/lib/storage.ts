@@ -24,36 +24,41 @@ function write(key: string, value: unknown): void {
   }
 }
 
-/* ---------- items ---------- */
+/* ---------- items ----------
+ * async: 나중에 이 구현을 API 호출(예: MongoDB 연동)로 바꿔도
+ * 호출부(useDiary.ts)는 그대로 두기 위한 의도적 설계. 지금은
+ * localStorage를 그대로 쓰되 Promise로만 감싼다. */
 
-export function loadItems(): DiaryItem[] {
+export async function loadItems(): Promise<DiaryItem[]> {
   const data = read<DiaryItem[]>(ITEMS_KEY, []);
   return Array.isArray(data) ? data.filter(isValidItem) : [];
 }
 
-export function saveItems(items: DiaryItem[]): void {
+export async function saveItems(items: DiaryItem[]): Promise<void> {
   write(ITEMS_KEY, items);
 }
 
 /* ---------- feedback ---------- */
 
-export function loadFeedback(): Record<string, DayFeedback> {
+export async function loadFeedback(): Promise<Record<string, DayFeedback>> {
   const data = read<Record<string, DayFeedback>>(FEEDBACK_KEY, {});
   return data && typeof data === "object" ? data : {};
 }
 
-export function saveFeedback(map: Record<string, DayFeedback>): void {
+export async function saveFeedback(
+  map: Record<string, DayFeedback>
+): Promise<void> {
   write(FEEDBACK_KEY, map);
 }
 
 /* ---------- theme ---------- */
 
-export function loadTheme(): ThemeMode {
+export async function loadTheme(): Promise<ThemeMode> {
   const t = read<ThemeMode>(THEME_KEY, "system");
   return t === "light" || t === "dark" || t === "system" ? t : "system";
 }
 
-export function saveTheme(mode: ThemeMode): void {
+export async function saveTheme(mode: ThemeMode): Promise<void> {
   write(THEME_KEY, mode);
 }
 

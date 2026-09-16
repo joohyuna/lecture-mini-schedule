@@ -20,10 +20,17 @@ export function useTheme() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const initial = loadTheme();
-    setMode(initial);
-    apply(initial);
-    setReady(true);
+    let cancelled = false;
+    (async () => {
+      const initial = await loadTheme();
+      if (cancelled) return;
+      setMode(initial);
+      apply(initial);
+      setReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // system 모드일 때 OS 설정 변경 반영
@@ -38,7 +45,7 @@ export function useTheme() {
   const cycle = useCallback(() => {
     setMode((prev) => {
       const next = ORDER[(ORDER.indexOf(prev) + 1) % ORDER.length];
-      saveTheme(next);
+      void saveTheme(next);
       apply(next);
       return next;
     });

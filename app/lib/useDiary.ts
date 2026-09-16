@@ -25,17 +25,28 @@ export function useDiary() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setItems(loadItems());
-    setFeedbackMap(loadFeedback());
-    setReady(true);
+    let cancelled = false;
+    (async () => {
+      const [loadedItems, loadedFeedback] = await Promise.all([
+        loadItems(),
+        loadFeedback(),
+      ]);
+      if (cancelled) return;
+      setItems(loadedItems);
+      setFeedbackMap(loadedFeedback);
+      setReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
-    if (ready) saveItems(items);
+    if (ready) void saveItems(items);
   }, [items, ready]);
 
   useEffect(() => {
-    if (ready) saveFeedback(feedback);
+    if (ready) void saveFeedback(feedback);
   }, [feedback, ready]);
 
   /** 특정 날짜 + 카테고리의 항목 (open 먼저, done/broken 나중, 각각 생성순) */

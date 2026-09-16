@@ -67,6 +67,7 @@ type DayMeta = Record<string, { total: number; open: number; broken: number; fee
 | `mini-diary:v1:theme` | `ThemeMode` |
 
 - 모든 저장소 접근은 `app/lib/storage.ts` 한 곳에 모은다. 왜 localStorage인지는 [[0001-storage-strategy]] 참고.
+- `storage.ts`의 모든 함수는 `Promise`를 반환한다(내부는 아직 localStorage 동기 구현). 나중에 MongoDB 등으로 바꿀 때 호출부(`useDiary.ts`, `useTheme.ts`)를 거의 안 건드리기 위한 의도적 설계 — 자세한 배경은 `docs/rfcs/mini-diary-v2-async-storage-prep.md` 참고. 첫 페인트 전 테마만 예외로 `app/layout.tsx`에서 `localStorage`를 동기 직접 접근한다(FOUC 방지).
 
 ### 다크 모드 구현
 
