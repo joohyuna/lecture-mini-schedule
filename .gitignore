@@ -28,6 +28,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# next.js가 자동 생성하는 AI 에이전트 규칙 파일
+# next.js가 자동 생성하는 AI 에이전트 규칙 파일 (CLAUDE.md는 프로젝트 규칙을 직접 채워 넣어 추적함)
 AGENTS.md
-CLAUDE.md
