@@ -8,6 +8,10 @@ interface Props {
   item: DiaryItem;
   isDont: boolean;
   readOnly: boolean;
+  /** 이미 충분히 넓은 컨테이너(팝업 등)에서는 모바일에서도 한 줄로 표시 */
+  wide?: boolean;
+  /** 모바일에서는 아예 숨기고 md부터만 표시(카드 인라인 개수 제한용) */
+  hiddenOnMobile?: boolean;
   onToggle: (id: string) => void;
   onEdit: (id: string, text: string) => void;
   onDelete: (id: string) => void;
@@ -17,6 +21,8 @@ export default function ItemRow({
   item,
   isDont,
   readOnly,
+  wide = false,
+  hiddenOnMobile = false,
   onToggle,
   onEdit,
   onDelete,
@@ -45,12 +51,21 @@ export default function ItemRow({
   return (
     <li
       className={cn(
-        "group flex flex-col gap-1 rounded-md px-2 py-1.5 text-sm",
+        "group gap-1 rounded-md px-2 py-1.5 text-sm",
         "hover:bg-neutral-100 dark:hover:bg-neutral-800/60",
-        "md:flex-row md:items-center md:gap-2"
+        hiddenOnMobile
+          ? "hidden md:flex md:items-center md:gap-2"
+          : wide
+            ? "flex flex-row items-center gap-2"
+            : "flex flex-col md:flex-row md:items-center md:gap-2"
       )}
     >
-      <div className="flex items-center gap-2 md:min-w-0 md:flex-1">
+      <div
+        className={cn(
+          "flex items-center gap-2",
+          wide || hiddenOnMobile ? "min-w-0 flex-1" : "md:min-w-0 md:flex-1"
+        )}
+      >
         {/* 상태 토글 */}
         {isDont ? (
         <button

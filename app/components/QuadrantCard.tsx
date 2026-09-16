@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { cn } from "../lib/cn";
 import {
+  CARD_MOBILE_VISIBLE_LIMIT,
   CARD_VISIBLE_LIMIT,
   CARRYABLE,
   CATEGORY_META,
@@ -52,7 +53,6 @@ export default function QuadrantCard({
   const visibleItems = [...items]
     .sort((a, b) => b.createdAt - a.createdAt)
     .slice(0, CARD_VISIBLE_LIMIT);
-  const hiddenCount = items.length - visibleItems.length;
 
   return (
     <section className="flex w-[calc(50%-0.375rem)] flex-col rounded-xl border border-neutral-200 bg-white p-3 md:w-[calc(50%-0.5rem)] md:p-4 dark:border-neutral-800 dark:bg-neutral-900">
@@ -72,12 +72,13 @@ export default function QuadrantCard({
       </header>
 
       <ul className="flex-1 space-y-0.5">
-        {visibleItems.map((item) => (
+        {visibleItems.map((item, idx) => (
           <ItemRow
             key={item.id}
             item={item}
             isDont={meta.isDont}
             readOnly={readOnly}
+            hiddenOnMobile={idx >= CARD_MOBILE_VISIBLE_LIMIT}
             onToggle={onToggle}
             onEdit={onEdit}
             onDelete={onDelete}
@@ -114,7 +115,7 @@ export default function QuadrantCard({
                 onClick={() => onAdd(category)}
                 className="rounded-md border border-dashed border-neutral-300 px-3 py-1.5 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
               >
-                + 항목 추가
+                + 추가
               </button>
             )}
           </li>
@@ -128,7 +129,7 @@ export default function QuadrantCard({
             onClick={() => setDetailOpen(true)}
             className="flex-1 rounded-md border border-neutral-300 px-3 py-1.5 text-xs font-medium text-neutral-500 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800"
           >
-            {hiddenCount > 0 ? `더보기 +${hiddenCount}` : "더보기"}
+            더보기
           </button>
 
           {!readOnly && (
@@ -143,7 +144,7 @@ export default function QuadrantCard({
                   : "border-neutral-300 text-neutral-500 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800"
               )}
             >
-              {full ? "카드당 최대 10개" : "+ 항목 추가"}
+              {full ? "카드당 최대 10개" : "+ 추가"}
             </button>
           )}
         </div>

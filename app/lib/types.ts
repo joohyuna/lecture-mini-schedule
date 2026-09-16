@@ -34,8 +34,10 @@ export const CATEGORIES: Category[] = ["longterm", "donow", "dont", "extra"];
 
 export const MAX_ITEMS_PER_CARD = 10;
 export const MAX_TEXT_LENGTH = 80;
-/** 카드에 한 번에 보이는 항목 수(최신순). 넘는 항목은 팝업(전체 보기)에서 확인 */
+/** 카드에 한 번에 보이는 항목 수(최신순, 데스크탑 기준). 넘는 항목은 팝업(전체 보기)에서 확인 */
 export const CARD_VISIBLE_LIMIT = 5;
+/** 모바일 카드에서는 더 좁으니 1개까지만 인라인 표시, 나머지는 더보기로 */
+export const CARD_MOBILE_VISIBLE_LIMIT = 1;
 
 interface CategoryMeta {
   label: string;

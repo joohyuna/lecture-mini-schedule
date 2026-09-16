@@ -75,6 +75,7 @@ export default function CardDetailModal({
             item={item}
             isDont={meta.isDont}
             readOnly={readOnly}
+            wide
             onToggle={onToggle}
             onEdit={onEdit}
             onDelete={onDelete}
@@ -99,7 +100,7 @@ export default function CardDetailModal({
               : "border-neutral-300 text-neutral-500 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800"
           )}
         >
-          {full ? "카드당 최대 10개" : "+ 항목 추가"}
+          {full ? "카드당 최대 10개" : "+ 추가"}
         </button>
       )}
     </Sheet>
