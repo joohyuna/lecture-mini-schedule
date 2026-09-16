@@ -8,8 +8,24 @@
 - **목적**: 한 화면에서 오늘 상태를 바로 확인하는 개인용 가벼운 다이어리.
 - **기술 스택**: Next.js 16 (App Router) + TypeScript + Tailwind CSS v4 + `tailwind-merge` + `clsx`.
 - **주요 진입점**: `app/page.tsx` (클라이언트 컴포넌트, 루트 상태 보유).
-- **실행**: `npm run dev` → `http://localhost:3001` (`dev`/`build`/`start` 모두 포트 3001 고정 — 다른 프로젝트와 포트 충돌 회피).
+- **실행**: `npm run dev` → `http://localhost:3001` (`dev`/`build`/`start` 모두 포트 3001 고정 — 기존 계산기 프로젝트와 포트 충돌 회피).
 - 상태관리·날짜·UUID 전용 라이브러리는 쓰지 않는다(`crypto.randomUUID()`, 네이티브 `Date`).
+
+### 의존성
+
+- `tailwind-merge` = 충돌하는 Tailwind 클래스 정리, `clsx` = 조건에 따라 클래스 켜고 끄기. 이 둘을 `cn()` 헬퍼로 묶는다.
+
+```ts
+// app/lib/cn.ts
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
+```
+
+| 구분 | 패키지 |
+|---|---|
+| dependencies | `next` `react` `react-dom` `tailwind-merge` `clsx` |
+| devDependencies | `typescript` `@types/node` `@types/react` `@types/react-dom` `tailwindcss` `@tailwindcss/postcss` `postcss` |
 
 ## 2. 데이터 모델
 
@@ -37,6 +53,9 @@ interface DayFeedback {
 }
 
 type ThemeMode = 'light' | 'dark' | 'system';
+
+// v1.1: MonthCalendar 점 표시용 날짜별 요약 (useDiary.dayMeta)
+type DayMeta = Record<string, { total: number; open: number; broken: number; feedback: boolean }>;
 ```
 
 ### localStorage 키
@@ -48,6 +67,12 @@ type ThemeMode = 'light' | 'dark' | 'system';
 | `mini-diary:v1:theme` | `ThemeMode` |
 
 - 모든 저장소 접근은 `app/lib/storage.ts` 한 곳에 모은다. 왜 localStorage인지는 [[0001-storage-strategy]] 참고.
+
+### 다크 모드 구현
+
+- Tailwind `dark:` 클래스 전략. 루트 `<html>`에 `dark` 클래스를 토글한다.
+- Tailwind v4: `globals.css`에 `@custom-variant dark (&:where(.dark, .dark *));`
+- `system` 모드일 때는 `prefers-color-scheme`으로 `dark` 클래스를 자동 부여한다.
 
 ## 3. 컴포넌트 / 파일 구조
 
@@ -93,7 +118,7 @@ type ThemeMode = 'light' | 'dark' | 'system';
 - 피드백: `key={selectedDate}` 로 날짜 전환 시 재마운트, `메모` 버튼 클릭 시 저장 + `저장됨` 2초 표시.
 - 날짜 이동: 스와이프는 세로 스크롤보다 가로 이동이 클 때만 인식, 방향키는 입력 중/팝업 열림 시 비활성, 미래 날짜 이동 차단.
 - 날짜 전환 시 `day-enter` 페이드, `prefers-reduced-motion` 존중.
-- `next dev`가 자동 생성하는 `AGENTS.md` / `CLAUDE.md`는 `.gitignore` 처리(레포에 커밋하지 않음, next dev가 재생성함).
+- `AGENTS.md`는 `next dev`가 자동 생성/재생성하는 보일러플레이트라 `.gitignore` 처리, 커밋하지 않는다. `CLAUDE.md`는 프로젝트 문서 규칙을 직접 작성해 넣은 파일이라 추적·커밋 대상이다.
 
 ## 5. 현재 미구현 / 다음 후보
 
