@@ -66,7 +66,7 @@ export default function CardDetailModal({
               className={cn("size-2 rounded-full", meta.dot)}
               aria-hidden="true"
             />
-            <h2 className="text-base font-bold">{meta.label}</h2>
+            <h2 className="break-keep text-base font-bold">{meta.label}</h2>
             <span className="text-xs text-neutral-400">
               {items.length}/{MAX_ITEMS_PER_CARD}
             </span>

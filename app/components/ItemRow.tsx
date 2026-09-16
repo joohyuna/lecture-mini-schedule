@@ -121,7 +121,7 @@ export default function ItemRow({
         <span
           onDoubleClick={() => !readOnly && setEditing(true)}
           className={cn(
-            "flex-1 break-words",
+            "flex-1 break-keep",
             done && "text-neutral-400 line-through dark:text-neutral-500",
             broken && "text-rose-600 dark:text-rose-400"
           )}

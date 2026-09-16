@@ -13,7 +13,7 @@ interface Props {
 
 export default function Board({ diary, selectedDate, readOnly, onAdd }: Props) {
   return (
-    <div className="flex flex-col gap-4 md:flex-row md:flex-wrap">
+    <div className="flex flex-row flex-wrap gap-3 md:gap-4">
       {CATEGORIES.map((category) => {
         const items = diary.getItems(selectedDate, category);
         const priorDate = diary.latestPriorDate(selectedDate, category);

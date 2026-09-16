@@ -55,14 +55,14 @@ export default function QuadrantCard({
   const hiddenCount = items.length - visibleItems.length;
 
   return (
-    <section className="flex flex-col rounded-xl border border-neutral-200 bg-white p-4 md:w-[calc(50%-0.5rem)] dark:border-neutral-800 dark:bg-neutral-900">
+    <section className="flex w-[calc(50%-0.375rem)] flex-col rounded-xl border border-neutral-200 bg-white p-3 md:w-[calc(50%-0.5rem)] md:p-4 dark:border-neutral-800 dark:bg-neutral-900">
       <header className="mb-2 flex items-baseline justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className={cn("size-2 rounded-full", meta.dot)} aria-hidden="true" />
-          <h2 className="font-semibold">{meta.label}</h2>
-          <span className="text-xs text-neutral-400">{meta.sub}</span>
+        <div className="flex min-w-0 items-center gap-2">
+          <span className={cn("size-2 shrink-0 rounded-full", meta.dot)} aria-hidden="true" />
+          <h2 className="break-keep font-semibold">{meta.label}</h2>
+          <span className="break-keep text-xs text-neutral-400">{meta.sub}</span>
         </div>
-        <span className="shrink-0 text-xs text-neutral-400">
+        <span className="shrink-0 break-keep text-xs text-neutral-400">
           {meta.isDont
             ? `${kept} 지킴 · ${brokenCount} 어김`
             : `${items.length}/${MAX_ITEMS_PER_CARD}`}
@@ -119,13 +119,13 @@ export default function QuadrantCard({
         )}
       </ul>
 
-      {hiddenCount > 0 && (
+      {items.length > 0 && (
         <button
           type="button"
           onClick={() => setDetailOpen(true)}
           className="mt-1 text-xs font-medium text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300"
         >
-          더보기 +{hiddenCount}
+          {hiddenCount > 0 ? `더보기 +${hiddenCount}` : "더보기"}
         </button>
       )}
 

@@ -86,6 +86,7 @@ type DayMeta = Record<string, { total: number; open: number; broken: number; fee
     - `QuadrantCard` ×4 — props: `title`, `category`, `items`, `readOnly`, 요약
       - `ItemRow` — 상태 토글, 텍스트(인라인 편집), 수정/삭제
       - `CarryForwardPrompt` — 비어 있을 때 [지난 항목 불러오기] / [직접 적기]
+      - `CardDetailModal` — "더보기" 팝업, 카드의 전체 항목(체크/수정/삭제 포함)
   - `DailyFeedback` — textarea + 메모 저장 버튼(읽기 전용 지원)
   - `SettingsMenu` — JSON 내보내기 / 가져오기
 
@@ -102,8 +103,9 @@ type DayMeta = Record<string, { total: number; open: number; broken: number; fee
 | 헤더(날짜, 📖 다이어리, + 입력, 테마, ⚙️ 설정) | `app/components/Header.tsx` |
 | 테마 토글 버튼 | `app/components/ThemeToggle.tsx` |
 | JSON 내보내기/가져오기 메뉴 | `app/components/SettingsMenu.tsx` |
-| 4분면 배치(flex 2×2 / 모바일 1열) | `app/components/Board.tsx` |
-| 카드(제목, 요약, 10개 제한, 이어가기 프롬프트) | `app/components/QuadrantCard.tsx` |
+| 4분면 배치(항상 2열 그리드, 데스크탑·모바일 동일) | `app/components/Board.tsx` |
+| 카드(제목, 요약, 10개 제한, 최신 5개 표시, 이어가기 프롬프트) | `app/components/QuadrantCard.tsx` |
+| "더보기" 팝업(카드 전체 항목) | `app/components/CardDetailModal.tsx` |
 | 항목 행(체크박스 / Don't 지킴·어김 토글, 인라인 수정, 삭제) | `app/components/ItemRow.tsx` |
 | 입력 모달(카테고리 세그먼트 + 내용) | `app/components/AddItemModal.tsx` |
 | 날짜 선택 팝업(월 달력) | `app/components/DiaryDatePopup.tsx` |
@@ -119,6 +121,7 @@ type DayMeta = Record<string, { total: number; open: number; broken: number; fee
 - 피드백: `key={selectedDate}` 로 날짜 전환 시 재마운트, `메모` 버튼 클릭 시 저장 + `저장됨` 2초 표시.
 - 날짜 이동: 스와이프는 세로 스크롤보다 가로 이동이 클 때만 인식, 방향키는 입력 중/팝업 열림 시 비활성, 미래 날짜 이동 차단.
 - 날짜 전환 시 `day-enter` 페이드, `prefers-reduced-motion` 존중.
+- 카드 표시: `CARD_VISIBLE_LIMIT`(5)개까지만 카드에 인라인 표시(최신순, `createdAt` 내림차순). 항목이 1개 이상이면 항상 "더보기" 버튼을 두고 `CardDetailModal`로 전체 목록을 보여준다(팝업 안에서도 체크/수정/삭제 가능). `Board`는 데스크탑·모바일 구분 없이 항상 2열 그리드(`flex-row flex-wrap`), 좁은 화면에서 한글이 음절 단위로 끊기지 않도록 카드 제목/항목 텍스트에 `break-keep` 적용.
 - `AGENTS.md`는 `next dev`가 자동 생성/재생성하는 보일러플레이트라 `.gitignore` 처리, 커밋하지 않는다. `CLAUDE.md`는 프로젝트 문서 규칙을 직접 작성해 넣은 파일이라 추적·커밋 대상이다.
 
 ## 5. 현재 미구현 / 다음 후보
