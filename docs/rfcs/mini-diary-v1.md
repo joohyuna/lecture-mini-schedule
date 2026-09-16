@@ -66,5 +66,5 @@
 
 ## 검증 방법
 
-- `npm run build` / 타입체크 통과.
-- `npm run dev` → `http://localhost:3001`에서 수동 확인.
+- `pnpm build` / 타입체크 통과.
+- `pnpm dev` → `http://localhost:3001`에서 수동 확인.

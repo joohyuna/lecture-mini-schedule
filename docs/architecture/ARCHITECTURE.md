@@ -8,7 +8,7 @@
 - **목적**: 한 화면에서 오늘 상태를 바로 확인하는 개인용 가벼운 다이어리.
 - **기술 스택**: Next.js 16 (App Router) + TypeScript + Tailwind CSS v4 + `tailwind-merge` + `clsx`.
 - **주요 진입점**: `app/page.tsx` (클라이언트 컴포넌트, 루트 상태 보유).
-- **실행**: `npm run dev` → `http://localhost:3001` (`dev`/`build`/`start` 모두 포트 3001 고정 — 기존 계산기 프로젝트와 포트 충돌 회피).
+- **실행**: `pnpm dev` → `http://localhost:3001` (`dev`/`build`/`start` 모두 포트 3001 고정 — 기존 계산기 프로젝트와 포트 충돌 회피).
 - 상태관리·날짜·UUID 전용 라이브러리는 쓰지 않는다(`crypto.randomUUID()`, 네이티브 `Date`).
 
 ### 의존성

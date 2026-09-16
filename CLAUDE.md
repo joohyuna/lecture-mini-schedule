@@ -6,11 +6,11 @@
 
 ## 1. 프로젝트 개요
 
-<!-- 한두 문단으로 이 프로젝트가 뭘 하는지, 핵심 기술 스택이 뭔지 적어주세요 -->
+미니다이어리 — 한 화면에서 "해야 할 일"과 "하지 말아야 할 일"을 4분면 카드(Longterm / Do Now / Don't / Extra)로 관리하는 개인용 가벼운 다이어리 웹앱. 서버·계정 없이 브라우저에만 저장한다. 자세한 배경과 스코프는 `docs/prd/mini-diary.md` 참고.
 
-- **목적**:
-- **기술 스택**:
-- **주요 진입점**: (예: `src/main.ts`, `app/main.py`)
+- **목적**: 매일 부담 없이 쓰는 한 화면 다이어리. 3스텝 이내 입력, 과거 기록은 읽기 전용으로 보존.
+- **기술 스택**: Next.js 16 (App Router) + TypeScript + Tailwind CSS v4 + tailwind-merge + clsx. 패키지 매니저는 pnpm. 저장소는 서버/DB 없이 브라우저 `localStorage`.
+- **주요 진입점**: `app/page.tsx` (클라이언트 컴포넌트, 루트 상태 보유).
 
 ---
 
@@ -60,18 +60,14 @@ docs/
 
 ## 5. 코드 스타일 / 컨벤션
 
-<!-- 프로젝트에 맞게 채워주세요 -->
-
-- 커밋 메시지 규칙: (예: Conventional Commits — `feat:`, `fix:`, `refactor:`)
-- 브랜치 전략: (예: `feature/`, `fix/` 프리픽스 + PR 필수)
-- 테스트: (예: 새 기능은 반드시 단위 테스트 동반, `npm test`로 확인)
-- 린트/포맷: (예: 커밋 전 `npm run lint` 통과 필수)
+- 커밋 메시지 규칙: Conventional Commits — `feat:`, `fix:`, `docs:`, `refactor:`, `chore:` 등 접두사 + 한글 설명.
+- 브랜치 전략: 현재 단독 개발이라 `master`에 직접 커밋한다. `push` 전에는 매번 사용자 확인을 받는다(6번 가드레일). 작업 규모가 커지면 `feature/<기능명>` 브랜치 + PR 방식으로 전환을 검토한다.
+- 테스트: 현재 자동화된 테스트 스위트 없음. 변경 후 최소 `pnpm build`로 타입체크·빌드 통과를 확인한다.
+- 린트/포맷: 현재 별도 lint 스크립트 없음(`next build`의 기본 타입 검사만 수행). 패키지 매니저는 `npm`이 아닌 `pnpm`을 쓴다(`pnpm dev` / `pnpm build`).
 
 ---
 
 ## 6. 하지 말아야 할 것 (Guardrails)
-
-<!-- 프로젝트 특성에 맞게 채워주세요. 예시: -->
 
 - `docs/adr/`에 있는 파일은 직접 수정하지 않는다 (append-only).
 - 사람 확인 없이 `main`/`master` 브랜치에 직접 푸시하지 않는다.
@@ -84,4 +80,4 @@ docs/
 
 - 아키텍처 현황: `docs/architecture/ARCHITECTURE.md`
 - 진행 중인 ADR 목록: `docs/adr/`
-- 이슈 트래커: (GitHub Issues URL)
+- 이슈 트래커: https://github.com/joohyuna/lecture-mini-schedule/issues
