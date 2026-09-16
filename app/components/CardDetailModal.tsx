@@ -15,6 +15,7 @@ interface Props {
   category: Category;
   items: DiaryItem[];
   readOnly: boolean;
+  isFuture: boolean;
   onClose: () => void;
   onAdd: (category: Category) => void;
   onToggle: (id: string) => void;
@@ -27,6 +28,7 @@ export default function CardDetailModal({
   category,
   items,
   readOnly,
+  isFuture,
   onClose,
   onAdd,
   onToggle,
@@ -75,6 +77,7 @@ export default function CardDetailModal({
             item={item}
             isDont={meta.isDont}
             readOnly={readOnly}
+            statusLocked={isFuture}
             wide
             onToggle={onToggle}
             onEdit={onEdit}

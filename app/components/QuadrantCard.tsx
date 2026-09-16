@@ -14,24 +14,30 @@ import {
 import { formatShortDate } from "../lib/date";
 import ItemRow from "./ItemRow";
 import CardDetailModal from "./CardDetailModal";
+import CarryForwardPicker from "./CarryForwardPicker";
 
 interface Props {
   category: Category;
   items: DiaryItem[];
   readOnly: boolean;
+  /** 미래 날짜: 추가/수정/삭제는 되지만 완료 체크는 아직 불가(계획 모드) */
+  isFuture: boolean;
   priorDate: string | null;
+  priorItems: DiaryItem[];
   onAdd: (category: Category) => void;
   onToggle: (id: string) => void;
   onEdit: (id: string, text: string) => void;
   onDelete: (id: string) => void;
-  onCarry: (category: Category) => void;
+  onCarry: (category: Category, ids: string[]) => void;
 }
 
 export default function QuadrantCard({
   category,
   items,
   readOnly,
+  isFuture,
   priorDate,
+  priorItems,
   onAdd,
   onToggle,
   onEdit,
@@ -39,6 +45,7 @@ export default function QuadrantCard({
   onCarry,
 }: Props) {
   const [detailOpen, setDetailOpen] = useState(false);
+  const [carryOpen, setCarryOpen] = useState(false);
 
   const meta = CATEGORY_META[category];
   const full = items.length >= MAX_ITEMS_PER_CARD;
@@ -78,6 +85,7 @@ export default function QuadrantCard({
             item={item}
             isDont={meta.isDont}
             readOnly={readOnly}
+            statusLocked={isFuture}
             hiddenOnMobile={idx >= CARD_MOBILE_VISIBLE_LIMIT}
             onToggle={onToggle}
             onEdit={onEdit}
@@ -95,7 +103,7 @@ export default function QuadrantCard({
                 <div className="flex justify-center gap-2">
                   <button
                     type="button"
-                    onClick={() => onCarry(category)}
+                    onClick={() => setCarryOpen(true)}
                     className="rounded-md bg-neutral-800 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-700 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-white"
                   >
                     지난 항목 불러오기
@@ -155,12 +163,28 @@ export default function QuadrantCard({
         category={category}
         items={items}
         readOnly={readOnly}
+        isFuture={isFuture}
         onClose={() => setDetailOpen(false)}
         onAdd={onAdd}
         onToggle={onToggle}
         onEdit={onEdit}
         onDelete={onDelete}
       />
+
+      {priorDate && (
+        <CarryForwardPicker
+          open={carryOpen}
+          category={category}
+          priorDate={priorDate}
+          priorItems={priorItems}
+          room={MAX_ITEMS_PER_CARD - items.length}
+          onClose={() => setCarryOpen(false)}
+          onConfirm={(ids) => {
+            onCarry(category, ids);
+            setCarryOpen(false);
+          }}
+        />
+      )}
     </section>
   );
 }

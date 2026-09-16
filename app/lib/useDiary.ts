@@ -127,12 +127,13 @@ export function useDiary() {
     setItems((prev) => prev.filter((it) => it.id !== id));
   }, []);
 
-  /** fromDate 의 category 항목들을 targetDate 로 복제 (내용만, 상태 초기화) */
+  /** fromDate 의 category 항목 중 ids로 고른 것만 targetDate 로 복제 (내용만, 상태 초기화) */
   const carryForward = useCallback(
-    (fromDate: string, targetDate: string, category: Category) => {
+    (fromDate: string, targetDate: string, category: Category, ids: string[]) => {
       setItems((prev) => {
+        const idSet = new Set(ids);
         const source = prev.filter(
-          (it) => it.date === fromDate && it.category === category
+          (it) => it.date === fromDate && it.category === category && idSet.has(it.id)
         );
         if (source.length === 0) return prev;
         const existing = prev.filter(

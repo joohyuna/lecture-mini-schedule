@@ -8,6 +8,8 @@ interface Props {
   item: DiaryItem;
   isDont: boolean;
   readOnly: boolean;
+  /** 상태 토글(완료 체크/어김)만 막는다 — 추가/수정/삭제는 가능(미래 날짜 계획 모드용) */
+  statusLocked?: boolean;
   /** 이미 충분히 넓은 컨테이너(팝업 등)에서는 모바일에서도 한 줄로 표시 */
   wide?: boolean;
   /** 모바일에서는 아예 숨기고 md부터만 표시(카드 인라인 개수 제한용) */
@@ -21,12 +23,14 @@ export default function ItemRow({
   item,
   isDont,
   readOnly,
+  statusLocked = false,
   wide = false,
   hiddenOnMobile = false,
   onToggle,
   onEdit,
   onDelete,
 }: Props) {
+  const toggleDisabled = readOnly || statusLocked;
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(item.text);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -70,7 +74,7 @@ export default function ItemRow({
         {isDont ? (
         <button
           type="button"
-          disabled={readOnly}
+          disabled={toggleDisabled}
           onClick={() => onToggle(item.id)}
           aria-pressed={broken}
           aria-label={broken ? "어김 해제" : "오늘 어김으로 표시"}
@@ -79,8 +83,8 @@ export default function ItemRow({
             broken
               ? "border-rose-500 bg-rose-500 text-white"
               : "border-neutral-300 text-neutral-400 dark:border-neutral-600",
-            !readOnly && "hover:border-rose-400",
-            readOnly && "cursor-default opacity-70"
+            !toggleDisabled && "hover:border-rose-400",
+            toggleDisabled && "cursor-default opacity-70"
           )}
         >
           {broken ? "어김" : "지킴"}
@@ -88,7 +92,7 @@ export default function ItemRow({
       ) : (
         <button
           type="button"
-          disabled={readOnly}
+          disabled={toggleDisabled}
           onClick={() => onToggle(item.id)}
           role="checkbox"
           aria-checked={done}
@@ -98,8 +102,8 @@ export default function ItemRow({
             done
               ? "border-neutral-400 bg-neutral-400 text-white dark:border-neutral-500 dark:bg-neutral-500"
               : "border-neutral-300 dark:border-neutral-600",
-            !readOnly && "hover:border-emerald-400",
-            readOnly && "cursor-default opacity-70"
+            !toggleDisabled && "hover:border-emerald-400",
+            toggleDisabled && "cursor-default opacity-70"
           )}
         >
           {done && (

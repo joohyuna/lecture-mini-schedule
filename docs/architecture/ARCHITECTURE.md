@@ -1,6 +1,6 @@
 # ARCHITECTURE.md — 미니다이어리
 
-> 마지막 갱신: 2026-09-16 (v1 + v1.1 날짜 이동·달력 반영)
+> 마지막 갱신: 2026-09-16 (v1 + v1.1 날짜 이동·달력 + v1.2 미래 날짜 계획 반영)
 > 이 문서는 "지금 구조가 어떤가"의 스냅샷이다. 왜 이렇게 결정했는지는 `docs/adr/`, 제품 요구사항은 `docs/prd/mini-diary.md` 참고.
 
 ## 1. 개요
@@ -86,10 +86,11 @@ type DayMeta = Record<string, { total: number; open: number; broken: number; fee
     - `QuadrantCard` ×4 — props: `title`, `category`, `items`, `readOnly`, 요약
       - `ItemRow` — 상태 토글, 텍스트(인라인 편집), 수정/삭제
       - `CarryForwardPrompt` — 비어 있을 때 [지난 항목 불러오기] / [직접 적기]
+      - `CarryForwardPicker` — "지난 항목 불러오기" 클릭 시 뜨는 선택 팝업(`Sheet` 기반), 전체 선택 기본값에서 원하는 항목만 체크
       - `CardDetailModal` — "더보기" 팝업, 카드의 전체 항목(체크/수정/삭제 포함) (`Sheet` 기반)
   - `DailyFeedback` — textarea + 메모 저장 버튼(읽기 전용 지원)
   - `SettingsMenu` — JSON 내보내기 / 가져오기
-- `Sheet` — 세 팝업(`AddItemModal`/`DiaryDatePopup`/`CardDetailModal`)이 공유하는 래퍼. 모바일은 하단 바텀시트, `md:`부터는 중앙(또는 상단) 모달. 배경 클릭·Esc 닫기, `document.body`로의 포털 렌더링을 여기서 전담.
+- `Sheet` — 네 팝업(`AddItemModal`/`DiaryDatePopup`/`CardDetailModal`/`CarryForwardPicker`)이 공유하는 래퍼. 모바일은 하단 바텀시트, `md:`부터는 중앙(또는 상단) 모달. 배경 클릭·Esc 닫기, `document.body`로의 포털 렌더링을 여기서 전담.
 
 | 역할 | 파일 |
 |---|---|
@@ -107,6 +108,7 @@ type DayMeta = Record<string, { total: number; open: number; broken: number; fee
 | 4분면 배치(항상 2열 그리드, 데스크탑·모바일 동일) | `app/components/Board.tsx` |
 | 카드(제목, 요약, 10개 제한, 최신 5개/모바일 1개 표시, 이어가기 프롬프트) | `app/components/QuadrantCard.tsx` |
 | "더보기" 팝업(카드 전체 항목) | `app/components/CardDetailModal.tsx` |
+| "지난 항목 불러오기" 선택 팝업 | `app/components/CarryForwardPicker.tsx` |
 | 항목 행(체크박스 / Don't 지킴·어김 토글, 인라인 수정, 삭제) | `app/components/ItemRow.tsx` |
 | 입력 모달(카테고리 세그먼트 + 내용) | `app/components/AddItemModal.tsx` |
 | 날짜 선택 팝업(월 달력) | `app/components/DiaryDatePopup.tsx` |
@@ -117,12 +119,13 @@ type DayMeta = Record<string, { total: number; open: number; broken: number; fee
 ## 4. 구현상 확정된 세부 규칙
 
 - 테마 아이콘: system `🖥️` / light `☀️` / dark `🌙`.
-- 과거 날짜: 헤더에 `지난 기록 · 읽기 전용` 배지, 카드 추가 버튼·상태 토글·수정/삭제 모두 비활성.
-- 헤더에는 전역 항목 추가 버튼이 없다(중복이라 제거). 항목 추가는 항상 각 `QuadrantCard`의 "+ 항목 추가"로 시작하고, 그 카드의 카테고리가 `AddItemModal`에 기본 선택된다.
-- carry-forward 대상: `Longterm`, `Don't` 만(`CARRYABLE`). 기준 날짜 = 해당 카테고리에 항목이 있는 가장 최근 과거 날짜.
+- 과거 날짜: 헤더에 `지난 기록 · 읽기 전용` 배지, 카드 추가 버튼·상태 토글·수정/삭제 모두 비활성(`readOnly`).
+- 미래 날짜(v1.2): 헤더에 `예정 · 계획 모드` 배지. 추가/수정/삭제는 되지만(`readOnly=false`) 상태 토글(완료 체크/어김)만 잠금(`ItemRow`의 `statusLocked` prop, `readOnly`와 별개). `page.tsx`의 `readOnly`는 "과거만", `isFuture`는 별도 플래그로 관리 — 하나의 불리언으로 합치지 않는다. `DailyFeedback`은 이 둘과 무관하게 "오늘이 아니면" 읽기 전용(`feedbackReadOnly = selectedDate !== today`, 회고는 당일에만).
+- 헤더에는 전역 항목 추가 버튼이 없다(중복이라 제거). 항목 추가는 항상 각 `QuadrantCard`의 "+ 추가"로 시작하고, 그 카드의 카테고리가 `AddItemModal`에 기본 선택된다.
+- carry-forward 대상: `Longterm`, `Don't` 만(`CARRYABLE`). 기준 날짜 = 해당 카테고리에 항목이 있는, 현재 보고 있는 날짜보다 이전인 가장 최근 날짜(`latestPriorDate`) — 오늘·미래 날짜 모두에서 동작. "지난 항목 불러오기"는 전부 자동 복사하지 않고 `CarryForwardPicker`로 어떤 항목을 가져올지 고르게 한다(기본 전체 선택, 카드 여유 개수만큼만 선택 가능). `useDiary.carryForward(fromDate, targetDate, category, ids)`가 `ids`로 받은 항목만 복제한다.
 - 10개 초과 시: 입력 모달에서 해당 카테고리 버튼 비활성 + 안내, 카드 하단 추가 버튼도 `카드당 최대 10개`로 비활성.
 - 피드백: `key={selectedDate}` 로 날짜 전환 시 재마운트, `메모` 버튼 클릭 시 저장 + `저장됨` 2초 표시.
-- 날짜 이동: 스와이프는 세로 스크롤보다 가로 이동이 클 때만 인식, 방향키는 입력 중/팝업 열림 시 비활성, 미래 날짜 이동 차단.
+- 날짜 이동: 스와이프는 세로 스크롤보다 가로 이동이 클 때만 인식, 방향키는 입력 중/팝업 열림 시 비활성. 미래 날짜 제한은 v1.2에서 없앴다(`goRelative`, `MonthCalendar`).
 - 날짜 전환 시 `day-enter` 페이드, `prefers-reduced-motion` 존중.
 - 카드 표시: 데스크탑은 `CARD_VISIBLE_LIMIT`(5)개, 모바일은 `CARD_MOBILE_VISIBLE_LIMIT`(1)개까지만 카드에 인라인 표시(최신순, `createdAt` 내림차순). JS 값 자체는 5개짜리(`visibleItems`) 하나만 계산하고, 모바일에서 추가로 숨길 항목(`idx >= CARD_MOBILE_VISIBLE_LIMIT`)은 `ItemRow`의 `hiddenOnMobile` prop으로 `hidden md:flex` 처리 — breakpoint별로 다른 개수를 보여주면서도 matchMedia 없이 순수 CSS로 처리. "더보기" 버튼은 숫자 없이 라벨 고정(카드 헤더에 이미 `N/10` 개수가 있어 중복이라 뺌). 항목이 1개 이상이면 항상 "더보기" 버튼을 두고 `CardDetailModal`로 전체 목록을 보여준다(팝업 안에서도 체크/수정/삭제 가능). `Board`는 데스크탑·모바일 구분 없이 항상 2열 그리드(`flex-row flex-wrap`), 좁은 화면에서 한글이 음절 단위로 끊기지 않도록 카드 제목/항목 텍스트에 `break-keep` 적용.
 - 모바일 `ItemRow`: 1줄(체크박스+텍스트) / 2줄(수정·삭제, 오른쪽 정렬)로 세로 스택, `md:`부터는 기존처럼 한 줄. 단, `CardDetailModal`(팝업) 안에서는 `wide` prop으로 모바일에서도 항상 한 줄 — 카드보다 팝업 폭이 넉넉해서 굳이 두 줄로 쪼갤 필요가 없음. 수정/삭제 아이콘은 모바일에서 항상 노출(호버가 없어서), 데스크탑은 그대로 호버 시에만 노출. 삭제 아이콘은 팝업 닫기(✕)와 헷갈리지 않도록 쓰레기통 모양. "더보기"와 "+ 추가"(항목 추가 버튼 라벨을 축약)는 한 줄에 나란한 버튼 쌍으로 표시(모바일·데스크탑 공통). `CardDetailModal` 헤더에는 카드에서 숨긴 부제(예: "장기 목표")를 항상 표시.
@@ -136,7 +139,6 @@ type DayMeta = Record<string, { total: number; open: number; broken: number; fee
 - 통계, 스트릭(연속 지킴 일수), 리마인더/알림.
 - 계정, 클라우드 동기화.
 - 태그, 우선순위, 마감일.
-- 미래 날짜 계획.
 
 ## 6. 검증 상태
 
@@ -147,5 +149,5 @@ type DayMeta = Record<string, { total: number; open: number; broken: number; fee
 - **모바일 키보드 + `Sheet` 바텀시트 상호작용 미검증.** `AddItemModal`은 `Sheet`(하단 고정, `position: fixed`) 안에 텍스트 입력창이 있는데, 모바일에서 입력창에 포커스가 가서 온스크린 키보드가 뜰 때 시트가 가려지거나 잘릴 위험이 있다.
   - 특히 iOS Safari는 키보드가 뜬 뒤 `fixed` 요소가 "보이는 화면(visual viewport)" 기준이 아니라 원래 레이아웃 기준으로 남아있는 경우가 있어 취약하다고 알려져 있음. 안드로이드 크롬은 상대적으로 덜함.
   - **Playwright 헤드리스 테스트로는 검증이 안 됨** — 실제 온스크린 키보드가 뜨는 걸 시뮬레이션하지 않기 때문에, 지금까지의 자동 검증은 이 시나리오를 커버하지 못했다.
-  - 실제 모바일 기기(특히 iOS Safari)에서 카드의 "+ 항목 추가"로 입력 모달을 열고 텍스트 입력창을 눌러 확인 필요.
+  - 실제 모바일 기기(특히 iOS Safari)에서 카드의 "+ 추가"로 입력 모달을 열고 텍스트 입력창을 눌러 확인 필요.
   - 문제가 확인되면 후보 해결책: `VisualViewport` API로 키보드 높이만큼 시트 위치/높이 보정, 또는 시트 `max-height`를 줄여서 여유를 두는 방법.

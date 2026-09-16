@@ -64,20 +64,16 @@ export default function MonthCalendar({ selectedDate, dayMeta, onPick }: Props) 
           const day = Number(date.split("-")[2]);
           const isToday = date === today;
           const isSelected = date === selectedDate;
-          const future = date > today;
 
           return (
             <button
               key={date}
               type="button"
-              disabled={future}
               onClick={() => onPick(date)}
               className={cn(
                 "flex h-11 flex-col items-center justify-center rounded-lg text-sm transition",
                 !inMonth && "text-neutral-300 dark:text-neutral-600",
-                future && "cursor-not-allowed opacity-40",
-                !future &&
-                  !isSelected &&
+                !isSelected &&
                   "hover:bg-neutral-100 dark:hover:bg-neutral-800",
                 isSelected &&
                   "bg-neutral-800 font-semibold text-white dark:bg-neutral-100 dark:text-neutral-900",

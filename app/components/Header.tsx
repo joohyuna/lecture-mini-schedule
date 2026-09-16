@@ -8,7 +8,7 @@ import ThemeToggle from "./ThemeToggle";
 interface Props {
   selectedDate: string;
   readOnly: boolean;
-  canGoNext: boolean;
+  isFuture: boolean;
   themeMode: ThemeMode;
   onPrevDay: () => void;
   onNextDay: () => void;
@@ -24,7 +24,7 @@ const navBtn =
 export default function Header({
   selectedDate,
   readOnly,
-  canGoNext,
+  isFuture,
   themeMode,
   onPrevDay,
   onNextDay,
@@ -33,8 +33,6 @@ export default function Header({
   onExport,
   onImport,
 }: Props) {
-  const today = !readOnly;
-
   return (
     <header className="mb-5 space-y-3">
       <div className="flex items-center justify-between gap-3">
@@ -65,15 +63,19 @@ export default function Header({
         <button
           type="button"
           onClick={onNextDay}
-          disabled={!canGoNext}
           aria-label="다음 날"
           className={navBtn}
         >
           ›
         </button>
-        {!today && (
+        {readOnly && (
           <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:bg-amber-950 dark:text-amber-400">
             지난 기록 · 읽기 전용
+          </span>
+        )}
+        {isFuture && (
+          <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[11px] font-medium text-sky-700 dark:bg-sky-950 dark:text-sky-400">
+            예정 · 계획 모드
           </span>
         )}
       </div>

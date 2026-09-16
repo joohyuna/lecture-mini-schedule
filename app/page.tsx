@@ -6,7 +6,7 @@ import Board from "./components/Board";
 import DailyFeedback from "./components/DailyFeedback";
 import DiaryDatePopup from "./components/DiaryDatePopup";
 import Header from "./components/Header";
-import { addDays, todayStr } from "./lib/date";
+import { addDays, isFuture as isFutureDate, todayStr } from "./lib/date";
 import { CATEGORIES, MAX_ITEMS_PER_CARD, type Category } from "./lib/types";
 import { useDiary } from "./lib/useDiary";
 import { useSwipe } from "./lib/useSwipe";
@@ -45,19 +45,16 @@ export default function HomePage() {
     }
   }, [today]);
 
-  const readOnly = selectedDate !== today;
-  const canGoNext = selectedDate < today;
+  // 과거 = 완전 읽기 전용, 미래 = 계획 모드(추가/수정/삭제는 되지만 완료 체크는 당일에만)
+  const readOnly = selectedDate < today;
+  const isFuture = isFutureDate(selectedDate);
+  // 하루의 피드백(회고)은 실제 그날에만 쓸 수 있다 — 미래 날짜엔 회고할 게 없음
+  const feedbackReadOnly = selectedDate !== today;
 
-  /** delta 일만큼 날짜 이동 (미래는 오늘까지만) */
-  const goRelative = useCallback(
-    (delta: number) => {
-      setSelectedDate((cur) => {
-        const next = addDays(cur, delta);
-        return next > todayStr() ? cur : next;
-      });
-    },
-    []
-  );
+  /** delta 일만큼 날짜 이동 */
+  const goRelative = useCallback((delta: number) => {
+    setSelectedDate((cur) => addDays(cur, delta));
+  }, []);
 
   // 좌우 방향키로 날짜 이동 (입력 중 / 팝업 열림 시 제외)
   useEffect(() => {
@@ -110,7 +107,7 @@ export default function HomePage() {
       <Header
         selectedDate={selectedDate}
         readOnly={readOnly}
-        canGoNext={canGoNext}
+        isFuture={isFuture}
         themeMode={theme.mode}
         onPrevDay={() => goRelative(-1)}
         onNextDay={() => goRelative(1)}
@@ -125,12 +122,13 @@ export default function HomePage() {
           diary={diary}
           selectedDate={selectedDate}
           readOnly={readOnly}
+          isFuture={isFuture}
           onAdd={openAdd}
         />
 
         <DailyFeedback
           value={feedbackText}
-          readOnly={readOnly}
+          readOnly={feedbackReadOnly}
           onSave={(text) => diary.setFeedback(selectedDate, text)}
         />
       </div>
