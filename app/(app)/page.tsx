@@ -1,19 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import AddItemModal from "./components/AddItemModal";
-import Board from "./components/Board";
-import DailyFeedback from "./components/DailyFeedback";
-import DiaryDatePopup from "./components/DiaryDatePopup";
-import Header from "./components/Header";
-import { addDays, isFuture as isFutureDate, todayStr } from "./lib/date";
-import { CATEGORIES, MAX_ITEMS_PER_CARD, type Category } from "./lib/types";
-import { useDiary } from "./lib/useDiary";
-import { useSwipe } from "./lib/useSwipe";
-import { useTheme } from "./lib/useTheme";
+import AddItemModal from "../components/AddItemModal";
+import Board from "../components/Board";
+import DailyFeedback from "../components/DailyFeedback";
+import DiaryDatePopup from "../components/DiaryDatePopup";
+import Header from "../components/Header";
+import { addDays, isFuture as isFutureDate, todayStr } from "../lib/date";
+import { useDiaryContext } from "../lib/DiaryContext";
+import { CATEGORIES, MAX_ITEMS_PER_CARD, type Category } from "../lib/types";
+import { useSwipe } from "../lib/useSwipe";
+import { useTheme } from "../lib/useTheme";
 
 export default function HomePage() {
-  const diary = useDiary();
+  const diary = useDiaryContext();
   const theme = useTheme();
 
   const [today, setToday] = useState(() => todayStr());
@@ -100,7 +100,7 @@ export default function HomePage() {
 
   return (
     <main
-      className="mx-auto max-w-4xl px-4 py-6 pb-16 sm:px-6"
+      className="mx-auto max-w-4xl px-4 py-6 sm:px-6"
       onTouchStart={swipe.onTouchStart}
       onTouchEnd={swipe.onTouchEnd}
     >
@@ -113,8 +113,6 @@ export default function HomePage() {
         onNextDay={() => goRelative(1)}
         onOpenDatePopup={() => setDateOpen(true)}
         onCycleTheme={theme.cycle}
-        onExport={diary.exportJSON}
-        onImport={diary.importJSON}
       />
 
       <div key={selectedDate} className="day-enter space-y-4">

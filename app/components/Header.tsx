@@ -2,7 +2,6 @@
 
 import { formatKoreanDate } from "../lib/date";
 import type { ThemeMode } from "../lib/types";
-import SettingsMenu from "./SettingsMenu";
 import ThemeToggle from "./ThemeToggle";
 
 interface Props {
@@ -14,8 +13,6 @@ interface Props {
   onNextDay: () => void;
   onOpenDatePopup: () => void;
   onCycleTheme: () => void;
-  onExport: () => string;
-  onImport: (text: string) => void;
 }
 
 const navBtn =
@@ -30,8 +27,6 @@ export default function Header({
   onNextDay,
   onOpenDatePopup,
   onCycleTheme,
-  onExport,
-  onImport,
 }: Props) {
   return (
     <header className="mb-5 space-y-3">
@@ -49,7 +44,6 @@ export default function Header({
             📅
           </button>
           <ThemeToggle mode={themeMode} onCycle={onCycleTheme} />
-          <SettingsMenu onExport={onExport} onImport={onImport} />
         </div>
       </div>
 

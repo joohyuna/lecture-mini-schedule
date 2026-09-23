@@ -38,6 +38,16 @@ export function isFuture(dateStr: string): boolean {
   return dateStr > todayStr();
 }
 
+/** 두 "YYYY-MM-DD" 사이의 일수 차이 (b - a, 양수면 b가 나중) */
+export function daysBetween(a: string, b: string): number {
+  const [ay, am, ad] = a.split("-").map(Number);
+  const [by, bm, bd] = b.split("-").map(Number);
+  const msPerDay = 24 * 60 * 60 * 1000;
+  return Math.round(
+    (Date.UTC(by, bm - 1, bd) - Date.UTC(ay, am - 1, ad)) / msPerDay
+  );
+}
+
 /** year, month(1-12) -> "2026년 9월" */
 export function monthLabel(year: number, month: number): string {
   return `${year}년 ${month}월`;

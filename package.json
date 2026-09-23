@@ -6,15 +6,20 @@
   "packageManager": "pnpm@11.7.0",
   "scripts": {
     "dev": "next dev -p 3001",
-    "build": "next build",
-    "start": "next start -p 3001"
+    "build": "prisma generate && next build",
+    "start": "next start -p 3001",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "next": "^16.3.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^3.6.0"
+    "tailwind-merge": "^3.6.0",
+    "@prisma/client": "6.19.3",
+    "bcryptjs": "^3.0.3",
+    "next-auth": "5.0.0-beta.32",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
@@ -23,6 +28,7 @@
     "typescript": "^5.9.0",
     "tailwindcss": "^4.3.3",
     "@tailwindcss/postcss": "^4.3.3",
-    "postcss": "^8.5.0"
+    "postcss": "^8.5.0",
+    "prisma": "6.19.3"
   }
 }

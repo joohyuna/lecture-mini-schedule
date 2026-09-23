@@ -94,3 +94,13 @@ docs/
 2. 성격에 맞는 git 추적 파일로 옮겨 적는다: 규칙/가드레일 → 이 파일, 기술 결정 → `docs/adr/`, 제품 스코프 → `docs/prd/`, 구조 변경 → `docs/architecture/ARCHITECTURE.md`.
 3. `pnpm exec tsc --noEmit` / `pnpm build`로 확인 후 커밋·푸시한다 (5번 참고). "메모리 저장해줘"는 커밋·푸시까지 자동 승인한 것으로 본다 — 사용자가 이 단계 전에 내용을 직접 검토하고 최종 확인을 거치는 경우가 많아, 6번 가드레일의 "사람 확인" 요건은 이미 충족된 것으로 간주한다.
 4. 이제 git 파일에 반영된 로컬 memory 항목은 **삭제**한다 — 같은 내용을 두 곳에 복제해서 남겨두지 않는다(git 파일이 유일한 출처).
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

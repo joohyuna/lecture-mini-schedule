@@ -1,0 +1,56 @@
+// Prisma schema — 미니다이어리
+// 반영: pnpm exec prisma db push   (MongoDB는 마이그레이션 없음)
+// 생성: pnpm exec prisma generate  (postinstall 에서도 자동 실행)
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  // output 지정 안 함 → 기본 위치(node_modules)로 생성.
+  // Next.js 16 + Turbopack 은 이 조합이 가장 안정적 (커스텀 output 은 파일 트레이싱 경고 발생).
+}
+
+model User {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  email        String        @unique
+  nickname     String // 화면에 표시되는 닉네임 (회원가입 시 입력)
+  passwordHash String // bcryptjs 해시 (평문 저장 안 함)
+  items        DiaryItem[]
+  feedback     DayFeedback[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+// id는 클라이언트가 crypto.randomUUID()로 생성한 문자열을 그대로 _id로 쓴다.
+// @db.ObjectId를 붙이지 않아야 24-hex ObjectId 포맷이 아닌 임의 문자열도 허용된다.
+// (app/lib/useDiary.ts가 이 id로 toggle/edit/delete하므로 서버가 id를 재발급하면 안 됨)
+model DiaryItem {
+  id        String   @id @map("_id")
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      String // "YYYY-MM-DD" — DateTime 아님, 타임존 버그 회피(기존 코드와 동일한 관점)
+  category  String // "longterm" | "donow" | "dont" | "extra" — 값 검증은 zod가 담당
+  text      String
+  status    String // "open" | "done" | "broken"
+  createdAt Float // epoch ms (Date.now()) — DateTime 아님, 클라이언트 정렬 로직 그대로 유지
+  updatedAt Float
+
+  @@index([userId, date])
+}
+
+// DayFeedback은 클라이언트에 별도 id가 없다(date를 키로 쓰는 Record<string, DayFeedback>).
+// _id는 API 라우트가 `${userId}:${date}`로 조립해서 넣는다 — useDiary.ts는 변경 없음.
+model DayFeedback {
+  id        String   @id @map("_id")
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      String
+  text      String
+  updatedAt Float
+
+  @@index([userId])
+  @@unique([userId, date])
+}

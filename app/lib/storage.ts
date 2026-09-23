@@ -1,7 +1,5 @@
 import type { DayFeedback, DiaryItem, ThemeMode } from "./types";
 
-const ITEMS_KEY = "mini-diary:v1:items";
-const FEEDBACK_KEY = "mini-diary:v1:feedback";
 const THEME_KEY = "mini-diary:v1:theme";
 
 function read<T>(key: string, fallback: T): T {
@@ -24,31 +22,67 @@ function write(key: string, value: unknown): void {
   }
 }
 
-/* ---------- items ----------
- * async: 나중에 이 구현을 API 호출(예: MongoDB 연동)로 바꿔도
- * 호출부(useDiary.ts)는 그대로 두기 위한 의도적 설계. 지금은
- * localStorage를 그대로 쓰되 Promise로만 감싼다. */
+/* ---------- items / feedback ----------
+ * MongoDB(Atlas) API 라우트를 호출한다. "전체 로드 / 전체 교체" 시맨틱은
+ * localStorage 시절과 동일하게 유지 — useDiary.ts는 이 함수들의 시그니처만
+ * 알면 되므로 변경 없음. 실패 시 콘솔 로그 + 커스텀 이벤트를 던지고 throw한다
+ * (호출부는 대부분 fire-and-forget이라, SettingsMenu가 이 이벤트를 듣고 토스트로 알린다). */
+
+function reportSyncError(scope: "items" | "feedback"): void {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(
+    new CustomEvent("mini-diary:sync-error", { detail: { scope } })
+  );
+}
 
 export async function loadItems(): Promise<DiaryItem[]> {
-  const data = read<DiaryItem[]>(ITEMS_KEY, []);
-  return Array.isArray(data) ? data.filter(isValidItem) : [];
+  const res = await fetch("/api/diary/items", { cache: "no-store" });
+  if (!res.ok) {
+    console.error("loadItems failed", res.status);
+    reportSyncError("items");
+    throw new Error("ITEMS_LOAD_FAILED");
+  }
+  const data = (await res.json()) as { items: DiaryItem[] };
+  return Array.isArray(data.items) ? data.items.filter(isValidItem) : [];
 }
 
 export async function saveItems(items: DiaryItem[]): Promise<void> {
-  write(ITEMS_KEY, items);
+  const res = await fetch("/api/diary/items", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ items }),
+  });
+  if (!res.ok) {
+    console.error("saveItems failed", res.status);
+    reportSyncError("items");
+    throw new Error("ITEMS_SAVE_FAILED");
+  }
 }
 
-/* ---------- feedback ---------- */
-
 export async function loadFeedback(): Promise<Record<string, DayFeedback>> {
-  const data = read<Record<string, DayFeedback>>(FEEDBACK_KEY, {});
-  return data && typeof data === "object" ? data : {};
+  const res = await fetch("/api/diary/feedback", { cache: "no-store" });
+  if (!res.ok) {
+    console.error("loadFeedback failed", res.status);
+    reportSyncError("feedback");
+    throw new Error("FEEDBACK_LOAD_FAILED");
+  }
+  const data = (await res.json()) as { feedback: Record<string, DayFeedback> };
+  return data.feedback && typeof data.feedback === "object" ? data.feedback : {};
 }
 
 export async function saveFeedback(
   map: Record<string, DayFeedback>
 ): Promise<void> {
-  write(FEEDBACK_KEY, map);
+  const res = await fetch("/api/diary/feedback", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ feedback: map }),
+  });
+  if (!res.ok) {
+    console.error("saveFeedback failed", res.status);
+    reportSyncError("feedback");
+    throw new Error("FEEDBACK_SAVE_FAILED");
+  }
 }
 
 /* ---------- theme ---------- */
