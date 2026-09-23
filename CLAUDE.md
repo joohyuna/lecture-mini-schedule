@@ -46,6 +46,7 @@ docs/
     - 결정이 바뀌면 새 ADR을 만들고 이전 ADR의 Status를 `Superseded by ADR-00XX`로 변경한다. 기존 ADR은 수정하지 않는다.
 4. 작업이 전체 구조에 영향을 준다면 `docs/architecture/ARCHITECTURE.md`를 갱신한다.
 5. 작업 완료 후 관련 GitHub Issue 상태를 갱신한다 (아래 4번 참고).
+6. Plan 모드에서 설계 갈림길이 여러 개 쌓이면, 선택지를 계속 묻기보다 먼저 명확한 추천 하나를 근거와 함께 제시하고 진행한다. 사용자가 언제든 다른 방향을 요청하면 그때 조정한다.
 
 ---
 
