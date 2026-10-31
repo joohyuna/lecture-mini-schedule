@@ -9,6 +9,7 @@
 - **기술 스택**: Next.js 16 (App Router) + TypeScript + Tailwind CSS v4 + `tailwind-merge` + `clsx` + Prisma 6.19.3 + MongoDB Atlas + Auth.js v5(Credentials + JWT 세션) + `bcryptjs` + `zod`.
 - **주요 진입점**: `app/(app)/page.tsx` (홈, 클라이언트 컴포넌트), `app/(app)/layout.tsx` (`DiaryProvider` + 하단 탭 바), `proxy.ts` (로그인 게이트), `app/lib/auth.ts` / `app/lib/prisma.ts` (인증·DB 핵심 설정 싱글턴).
 - **실행**: `.env.example`을 `.env`로 복사해 `DATABASE_URL`/`AUTH_SECRET`을 채운 뒤 `pnpm dev` → `http://localhost:3001` (`dev`/`build`/`start` 모두 포트 3001 고정 — 기존 계산기 프로젝트와 포트 충돌 회피).
+- **배포**: Vercel(`https://lecture-mini-schedule.vercel.app`), `master` 푸시 시 자동 배포. `.env`는 git에서 제외되므로 `DATABASE_URL`/`AUTH_SECRET`은 Vercel 환경변수(Production)에 따로 등록해야 하고, 값을 바꾸면 재배포해야 적용된다. `AUTH_SECRET`이 없으면 `/api/auth/*`가 500 서버 설정 오류를 반환한다. Atlas 클러스터와 DB 계정은 todo 프로젝트와 공유하므로 DB 비밀번호를 바꾸면 todo의 값도 함께 바꾼다.
 - 상태관리·날짜·UUID 전용 라이브러리는 쓰지 않는다(`crypto.randomUUID()`, 네이티브 `Date`). 로그인/가입 폼도 `react-hook-form` 없이 기존 컴포넌트와 같은 `useState` 컨트롤드 방식.
 
 ### 의존성
