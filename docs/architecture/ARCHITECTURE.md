@@ -114,6 +114,7 @@ type DayMeta = Record<string, { total: number; open: number; broken: number; fee
     - `AccountForm` — 닉네임 변경, 비밀번호 변경, JSON 내보내기/가져오기, 로그아웃을 모은 클라이언트 폼(옛 `SettingsMenu`의 내용을 흡수)
   - `BottomNav` — 🏠 홈 · 📊 통계 · 👤 계정 3탭, `usePathname()`으로 활성 탭 표시, `fixed bottom-0` + `env(safe-area-inset-bottom)`
   - `SyncErrorToast` — `mini-diary:sync-error` 이벤트를 전역에서 듣고 토스트로 알림
+  - `RegisteredToast` — 가입 직후 `AuthForm`이 `sessionStorage`에 남긴 1회용 표시를 읽어 완료 토스트를 3초간 표시
 - `Sheet` — 네 팝업(`AddItemModal`/`DiaryDatePopup`/`CardDetailModal`/`CarryForwardPicker`)이 공유하는 래퍼. 모바일은 하단 바텀시트, `md:`부터는 중앙(또는 상단) 모달. 배경 클릭·Esc 닫기, `document.body`로의 포털 렌더링을 여기서 전담.
 
 | 역할 | 파일 |
@@ -141,6 +142,7 @@ type DayMeta = Record<string, { total: number; open: number; broken: number; fee
 | 첫 페인트 전 테마 적용(깜빡임 방지) | `app/layout.tsx` |
 | 하단 탭 바(🏠 홈 · 📊 통계 · 👤 계정) | `app/components/BottomNav.tsx` |
 | 저장 실패 전역 토스트(`mini-diary:sync-error` 리스너) | `app/components/SyncErrorToast.tsx` |
+| 회원가입 완료 토스트 | `app/components/RegisteredToast.tsx` |
 | 닉네임/비밀번호 변경 + JSON 내보내기/가져오기 + 로그아웃 폼 | `app/components/AccountForm.tsx` |
 | 헤더(1행: 앱 이름 + 📅/테마, 2행: 날짜 이동+날짜 텍스트) | `app/components/Header.tsx` |
 | 테마 토글 버튼 | `app/components/ThemeToggle.tsx` |

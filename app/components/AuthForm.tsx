@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { loginSchema, registerSchema } from "../lib/schemas";
+import { markRegistered } from "./RegisteredToast";
 
 interface Props {
   mode: "login" | "register";
@@ -66,6 +67,7 @@ export default function AuthForm({ mode }: Props) {
         setError("이메일 또는 비밀번호가 올바르지 않습니다.");
         return;
       }
+      if (mode === "register") markRegistered();
       router.push("/");
       router.refresh();
     } finally {
